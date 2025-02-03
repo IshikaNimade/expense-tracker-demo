@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "root",
+    "password": "Lopo7890@",
+    "database": "expence_tracker",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}
