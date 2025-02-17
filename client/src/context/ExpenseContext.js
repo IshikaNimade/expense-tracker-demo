@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import {
   getExpenses,
   addExpense,
@@ -19,6 +25,32 @@ export const ExpenseProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
+  const fetchExpenses = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      setLoading(true);
+      const data = await getExpenses();
+      setExpenses(data.expenses || []);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  const fetchDashboardStats = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      setLoading(true);
+      const stats = await getDashboardStats();
+      setDashboardStats(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchDashboardStats();
@@ -31,33 +63,7 @@ export const ExpenseProvider = ({ children }) => {
         totalExpenses: 0,
       });
     }
-  }, [isAuthenticated, user]);
-
-  const fetchExpenses = async () => {
-    if (!isAuthenticated) return;
-    try {
-      setLoading(true);
-      const data = await getExpenses();
-      setExpenses(data.expenses || []);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDashboardStats = async () => {
-    if (!isAuthenticated) return;
-    try {
-      setLoading(true);
-      const stats = await getDashboardStats();
-      setDashboardStats(stats);
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isAuthenticated, user, fetchDashboardStats, fetchExpenses]);
 
   const createExpense = async (expenseData) => {
     try {
